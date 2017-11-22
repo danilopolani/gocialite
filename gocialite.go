@@ -13,8 +13,8 @@ import (
 	"gopkg.in/oleiade/reflections.v1"
 )
 
-// user struct
-type user struct {
+// User struct
+type User struct {
 	ID        string                 `json:"id"`
 	Username  string                 `json:"username"`
 	FirstName string                 `json:"first_name"`
@@ -22,7 +22,7 @@ type user struct {
 	FullName  string                 `json:"full_name"`
 	Email     string                 `json:"email"`
 	Avatar    string                 `json:"avatar"`
-	Raw       map[string]interface{} `json:"user"` // Raw data
+	Raw       map[string]interface{} `json:"raw"` // Raw data
 }
 
 // Gocial is the main struct of the package
@@ -30,7 +30,8 @@ type Gocial struct {
 	driver, state string
 	scopes        []string
 	conf          *oauth2.Config
-	User          user
+	User          User
+	Token         *oauth2.Token
 }
 
 // Set the basic information such as the endpoint and the scopes URIs
@@ -106,6 +107,9 @@ func (g *Gocial) Handle(state, code string) error {
 
 	client := g.conf.Client(oauth2.NoContext, token)
 
+	// Set gocial token
+	g.Token = token
+
 	// Retrieve all from scopes
 	driverAPI := mapAPI[g.driver]
 	driverUserMap := mapUser[g.driver]
@@ -134,7 +138,7 @@ func (g *Gocial) Handle(state, code string) error {
 
 			// Scan all fields and dispatch through the mapping
 			mapKeys := keys(driverUserMap)
-			gUser := user{}
+			gUser := User{}
 			for k, f := range data {
 				if !inSlice(k, mapKeys) { // Skip if not in the mapping
 					continue
