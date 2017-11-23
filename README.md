@@ -48,20 +48,20 @@ func redirectHandler(c *gin.Context) {
 	authURL := gocial.Driver("github"). // Set provider
 		Scopes([]string{"public_repo"}). // Set optional scope(s)
 		Redirect( // 
-			"xxxxxxxxxxxxxx",
-			"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-			"http://localhost:9090/auth/github/callback",
+			"xxxxxxxxxxxxxx", // Client ID
+			"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", // Client Secret
+			"http://localhost:9090/auth/github/callback", // Redirect URL
 		)
 
 	// Redirect with authURL
-	c.Redirect(http.StatusFound, authURL)
+	c.Redirect(http.StatusFound, authURL) // Redirect with 302 HTTP code
 }
 ```
 
 Now create a callback handler route, where we'll receive the content from the provider.  
 In order to validate the oAuth and retrieve the data, you have to invoke the `Handle()` method with two query parameters: `state` and `code`. In your URL, they will look like this: `http://localhost:9090/auth/github/callback?state=xxxxxxxx&code=xxxxxxxx`.  
 The `Handle()` method returns an error if there's one or `nil`.  
-If there aren't error, in the `User` property of your `gocial` variable, you will find the logged in user information and in the `Token` one, the token info (it's a [oauth2.Token struct](https://godoc.org/golang.org/x/oauth2#Token)). The data of the user - which is a [gocialite.user struct](https://godoc.org/github.com/danilopolani/gocialite#User) - are the following:
+If there are no errors, in the `User` property of your `gocial` variable, you will find the logged in user information and in the `Token` one, the token info (it's a [oauth2.Token struct](https://godoc.org/golang.org/x/oauth2#Token)). The data of the user - which is a [gocialite.User struct](https://godoc.org/github.com/danilopolani/gocialite#User) - are the following:
 
 - ID
 - FirstName
