@@ -7,54 +7,33 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/danilopolani/gocialite/drivers"
+	"github.com/danilopolani/gocialite/structs"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 	"golang.org/x/oauth2/linkedin"
 	"gopkg.in/oleiade/reflections.v1"
 )
 
-// User struct
-type User struct {
-	ID        string                 `json:"id"`
-	Username  string                 `json:"username"`
-	FirstName string                 `json:"first_name"`
-	LastName  string                 `json:"last_name"`
-	FullName  string                 `json:"full_name"`
-	Email     string                 `json:"email"`
-	Avatar    string                 `json:"avatar"`
-	Raw       map[string]interface{} `json:"raw"` // Raw data
-}
-
 // Gocial is the main struct of the package
 type Gocial struct {
 	driver, state string
 	scopes        []string
 	conf          *oauth2.Config
-	User          User
+	User          structs.User
 	Token         *oauth2.Token
 }
 
 // Set the basic information such as the endpoint and the scopes URIs
-var mapAPI = map[string]map[string]string{
-	"github": {
-		"endpoint":       "https://api.github.com",
-		"basicUserScope": "read:user",
-		// Scopes
-		"user":      "/user",
-		"read:user": "/user",
-		"repo":      "/user/repos",
-	},
+var apiMap = map[string]map[string]string{
+	"github":   drivers.GithubAPIMap,
+	"linkedin": drivers.LinkedInAPIMap,
 }
 
 // Mapping to create a valid "user" struct from providers
-var mapUser = map[string]map[string]string{
-	"github": {
-		"id":         "ID",
-		"email":      "Email",
-		"login":      "Username",
-		"avatar_url": "Avatar",
-		"name":       "FullName",
-	},
+var userMap = map[string]map[string]string{
+	"github":   drivers.GithubUserMap,
+	"linkedin": drivers.LinkedInUserMap,
 }
 
 // Driver is needed to choose the correct social
@@ -72,7 +51,7 @@ func (g *Gocial) Scopes(scopes []string) *Gocial {
 }
 
 // Redirect returns an URL for the selected social oAuth login
-func (g *Gocial) Redirect(clientID, clientSecret, redirectURL string) string {
+func (g *Gocial) Redirect(clientID, clientSecret, redirectURL string) (string, error) {
 	// Retrieve correct endpoint
 	var endpoint oauth2.Endpoint
 	switch g.driver {
@@ -80,6 +59,8 @@ func (g *Gocial) Redirect(clientID, clientSecret, redirectURL string) string {
 		endpoint = github.Endpoint
 	case "linkedin":
 		endpoint = linkedin.Endpoint
+	default:
+		return "", fmt.Errorf("Driver not valid: %s", g.driver)
 	}
 
 	g.conf = &oauth2.Config{
@@ -90,7 +71,7 @@ func (g *Gocial) Redirect(clientID, clientSecret, redirectURL string) string {
 		Endpoint:     endpoint,
 	}
 
-	return g.conf.AuthCodeURL(g.state)
+	return g.conf.AuthCodeURL(g.state), nil
 }
 
 // Handle callback from provider
@@ -111,49 +92,39 @@ func (g *Gocial) Handle(state, code string) error {
 	g.Token = token
 
 	// Retrieve all from scopes
-	driverAPI := mapAPI[g.driver]
-	driverUserMap := mapUser[g.driver]
-	scopes := g.scopes
+	driverAPIMap := apiMap[g.driver]
+	driverUserMap := userMap[g.driver]
 
-	// Always append user scope
-	if !inSlice("user", scopes) && !inSlice("read:user", scopes) {
-		scopes = append([]string{driverAPI["basicUserScope"]}, scopes...)
+	// Get user info
+	req, err := client.Get(driverAPIMap["endpoint"] + driverAPIMap["userEndpoint"])
+	if err != nil {
+		return err
 	}
 
-	for _, scope := range scopes {
-		req, err := client.Get(driverAPI["endpoint"] + driverAPI[scope])
-		if err != nil {
-			return err
-		}
-
-		defer req.Body.Close()
-		res, _ := ioutil.ReadAll(req.Body)
-
-		// If the scope is about the user, save the details
-		if scope == driverAPI["basicUserScope"] || scope == "user" {
-			data, err := jsonDecode(res)
-			if err != nil {
-				return fmt.Errorf("Error decoding JSON: %s", err.Error())
-			}
-
-			// Scan all fields and dispatch through the mapping
-			mapKeys := keys(driverUserMap)
-			gUser := User{}
-			for k, f := range data {
-				if !inSlice(k, mapKeys) { // Skip if not in the mapping
-					continue
-				}
-
-				// Assign the value
-				_ = reflections.SetField(&gUser, driverUserMap[k], fmt.Sprint(f)) // Dirty way, but we need to convert also int/float to string
-			}
-
-			// Set the "raw" user interface
-			gUser.Raw = data
-			// Update the struct
-			g.User = gUser
-		}
+	defer req.Body.Close()
+	res, _ := ioutil.ReadAll(req.Body)
+	data, err := jsonDecode(res)
+	if err != nil {
+		return fmt.Errorf("Error decoding JSON: %s", err.Error())
 	}
+
+	// Scan all fields and dispatch through the mapping
+	mapKeys := keys(driverUserMap)
+	gUser := structs.User{}
+	for k, f := range data {
+		if !inSlice(k, mapKeys) { // Skip if not in the mapping
+			continue
+		}
+
+		// Assign the value
+		// Dirty way, but we need to convert also int/float to string
+		_ = reflections.SetField(&gUser, driverUserMap[k], fmt.Sprint(f))
+	}
+
+	// Set the "raw" user interface
+	gUser.Raw = data
+	// Update the struct
+	g.User = gUser
 
 	return nil
 }
