@@ -1,4 +1,8 @@
 # Gocialite
+![Travis CI build](https://api.travis-ci.org/danilopolani/gocialite.svg?branch=master)
+[![GoDoc](https://godoc.org/github.com/danilopolani/gocialite?status.svg)](https://godoc.org/github.com/danilopolani/gocialite)
+[![GoReport](https://goreportcard.com/badge/github.com/danilopolani/gocialite)](https://goreportcard.com/report/github.com/danilopolani/gocialite)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 Gocialite is an heavy Socialite inspired package to manage social oAuth authentication without problems.
 The idea was born when I discovered that Goth is not so flexible: I was using Revel and it was *impossible* to connect them properly.
@@ -11,6 +15,7 @@ To install it, just run `go get github.com/danilopolani/gocialite` and include i
 
 - GitHub
 - LinkedIn
+- Facebook
 
 ## How to use it
 
