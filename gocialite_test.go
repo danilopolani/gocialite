@@ -12,6 +12,13 @@ func TestScopes(t *testing.T) {
 	gocialTest.Scopes([]string{"email"})
 	assert.Equal(t, gocialTest.scopes, []string{"email"})
 	assert.NotEqual(t, gocialTest.scopes, []string{})
+
+	gocialTest.
+		Driver("google").
+		Scopes([]string{"calendar.readonly"})
+	assert.Equal(t, gocialTest.scopes, []string{"profile", "email", "calendar.readonly"})
+	assert.NotEqual(t, gocialTest.scopes, []string{"profile", "email"})
+	assert.NotEqual(t, gocialTest.scopes, []string{})
 }
 func TestConf(t *testing.T) {
 	assert := assert.New(t)

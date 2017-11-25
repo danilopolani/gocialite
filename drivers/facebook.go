@@ -25,3 +25,6 @@ var FacebookAPIMap = map[string]string{
 var FacebookUserFn = func(client *http.Client, u *structs.User) {
 	u.Avatar = FacebookAPIMap["endpoint"] + "/v2.8/" + u.ID + "/picture?width=800"
 }
+
+// FacebookDefaultScopes contains the default scopes
+var FacebookDefaultScopes = []string{"email"}

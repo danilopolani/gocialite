@@ -25,3 +25,6 @@ var LinkedInAPIMap = map[string]string{
 
 // LinkedInUserFn is a callback to parse additional fields for User
 var LinkedInUserFn = func(client *http.Client, u *structs.User) {}
+
+// LinkedInDefaultScopes contains the default scopes
+var LinkedInDefaultScopes = []string{}

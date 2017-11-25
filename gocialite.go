@@ -15,6 +15,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/github"
+	"golang.org/x/oauth2/google"
 	"golang.org/x/oauth2/linkedin"
 	"gopkg.in/oleiade/reflections.v1"
 )
@@ -33,6 +34,7 @@ var apiMap = map[string]map[string]string{
 	"github":   drivers.GithubAPIMap,
 	"linkedin": drivers.LinkedInAPIMap,
 	"facebook": drivers.FacebookAPIMap,
+	"google":   drivers.GoogleAPIMap,
 }
 
 // Mapping to create a valid "user" struct from providers
@@ -40,6 +42,7 @@ var userMap = map[string]map[string]string{
 	"github":   drivers.GithubUserMap,
 	"linkedin": drivers.LinkedInUserMap,
 	"facebook": drivers.FacebookUserMap,
+	"google":   drivers.GoogleUserMap,
 }
 
 // Map correct endpoints
@@ -47,6 +50,7 @@ var endpointMap = map[string]oauth2.Endpoint{
 	"github":   github.Endpoint,
 	"linkedin": linkedin.Endpoint,
 	"facebook": facebook.Endpoint,
+	"google":   google.Endpoint,
 }
 
 // Map custom callbacks
@@ -54,11 +58,22 @@ var callbackMap = map[string]func(client *http.Client, u *structs.User){
 	"github":   drivers.GithubUserFn,
 	"linkedin": drivers.LinkedInUserFn,
 	"facebook": drivers.FacebookUserFn,
+	"google":   drivers.GoogleUserFn,
+}
+
+// Default scopes for each driver
+var defaultScopesMap = map[string][]string{
+	"github":   drivers.GithubDefaultScopes,
+	"linkedin": drivers.LinkedInDefaultScopes,
+	"facebook": drivers.FacebookDefaultScopes,
+	"google":   drivers.GoogleDefaultScopes,
 }
 
 // Driver is needed to choose the correct social
 func (g *Gocial) Driver(driver string) *Gocial {
 	g.driver = driver
+	g.scopes = defaultScopesMap[driver]
+
 	g.state = randToken()
 
 	return g
@@ -66,17 +81,13 @@ func (g *Gocial) Driver(driver string) *Gocial {
 
 // Scopes is used to set the oAuth scopes, for example "user", "calendar"
 func (g *Gocial) Scopes(scopes []string) *Gocial {
-	g.scopes = scopes
+	g.scopes = append(g.scopes, scopes...)
 	return g
 }
 
 // Redirect returns an URL for the selected social oAuth login
 func (g *Gocial) Redirect(clientID, clientSecret, redirectURL string) (string, error) {
 	// Check if driver is valid
-	fmt.Println(g.driver)
-	fmt.Println(complexKeys(apiMap))
-	fmt.Println(inSlice(g.driver, complexKeys(apiMap)))
-
 	if !inSlice(g.driver, complexKeys(apiMap)) {
 		return "", fmt.Errorf("Driver not valid: %s", g.driver)
 	}

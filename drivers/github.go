@@ -23,3 +23,6 @@ var GithubAPIMap = map[string]string{
 
 // GithubUserFn is a callback to parse additional fields for User
 var GithubUserFn = func(client *http.Client, u *structs.User) {}
+
+// GithubDefaultScopes contains the default scopes
+var GithubDefaultScopes = []string{}
