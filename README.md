@@ -16,8 +16,32 @@ To install it, just run `go get github.com/danilopolani/gocialite` and include i
 - GitHub
 - LinkedIn
 - Facebook
+- Google
+
+## Set scopes
+
+**Note**: Gocialite set some default scopes for the user profile, for example for *Facebook* it specify `email` and for *Google* `profile, email`.  
+When you use the following method, you don't have to rewrite them. 
+
+Use the `Scopes([]string)` method of your `Gocial` instance. Example:
+
+```
+var gocial gocialite.Gocial
+gocial.Scopes([]string{"public_repo"})
+```
+
+## Set driver
+
+Use the `Driver(string)` method of your `Gocial` instance. Example:
+
+```
+var gocial gocialite.Gocial
+gocial.Driver("facebook")
+```
 
 ## How to use it
+
+**Note**: All Gocialite methods are chainable.
 
 Declare a "global" variable outside your `main` func:
 
