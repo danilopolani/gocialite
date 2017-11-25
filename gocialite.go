@@ -6,10 +6,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
+	"net/url"
+	"strings"
 
 	"github.com/danilopolani/gocialite/drivers"
 	"github.com/danilopolani/gocialite/structs"
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/github"
 	"golang.org/x/oauth2/linkedin"
 	"gopkg.in/oleiade/reflections.v1"
@@ -28,12 +32,28 @@ type Gocial struct {
 var apiMap = map[string]map[string]string{
 	"github":   drivers.GithubAPIMap,
 	"linkedin": drivers.LinkedInAPIMap,
+	"facebook": drivers.FacebookAPIMap,
 }
 
 // Mapping to create a valid "user" struct from providers
 var userMap = map[string]map[string]string{
 	"github":   drivers.GithubUserMap,
 	"linkedin": drivers.LinkedInUserMap,
+	"facebook": drivers.FacebookUserMap,
+}
+
+// Map correct endpoints
+var endpointMap = map[string]oauth2.Endpoint{
+	"github":   github.Endpoint,
+	"linkedin": linkedin.Endpoint,
+	"facebook": facebook.Endpoint,
+}
+
+// Map custom callbacks
+var callbackMap = map[string]func(client *http.Client, u *structs.User){
+	"github":   drivers.GithubUserFn,
+	"linkedin": drivers.LinkedInUserFn,
+	"facebook": drivers.FacebookUserFn,
 }
 
 // Driver is needed to choose the correct social
@@ -52,15 +72,22 @@ func (g *Gocial) Scopes(scopes []string) *Gocial {
 
 // Redirect returns an URL for the selected social oAuth login
 func (g *Gocial) Redirect(clientID, clientSecret, redirectURL string) (string, error) {
-	// Retrieve correct endpoint
-	var endpoint oauth2.Endpoint
-	switch g.driver {
-	case "github":
-		endpoint = github.Endpoint
-	case "linkedin":
-		endpoint = linkedin.Endpoint
-	default:
+	// Check if driver is valid
+	fmt.Println(g.driver)
+	fmt.Println(complexKeys(apiMap))
+	fmt.Println(inSlice(g.driver, complexKeys(apiMap)))
+
+	if !inSlice(g.driver, complexKeys(apiMap)) {
 		return "", fmt.Errorf("Driver not valid: %s", g.driver)
+	}
+
+	// Check if valid redirectURL
+	_, err := url.ParseRequestURI(redirectURL)
+	if err != nil {
+		return "", fmt.Errorf("Redirect URL <%s> not valid: %s", redirectURL, err.Error())
+	}
+	if !strings.HasPrefix(redirectURL, "http://") && !strings.HasPrefix(redirectURL, "https://") {
+		return "", fmt.Errorf("Redirect URL <%s> not valid: protocol not valid", redirectURL)
 	}
 
 	g.conf = &oauth2.Config{
@@ -68,7 +95,7 @@ func (g *Gocial) Redirect(clientID, clientSecret, redirectURL string) (string, e
 		ClientSecret: clientSecret,
 		RedirectURL:  redirectURL,
 		Scopes:       g.scopes,
-		Endpoint:     endpoint,
+		Endpoint:     endpointMap[g.driver],
 	}
 
 	return g.conf.AuthCodeURL(g.state), nil
@@ -81,9 +108,14 @@ func (g *Gocial) Handle(state, code string) error {
 		return fmt.Errorf("Invalid state: %s", state)
 	}
 
+	// Check if driver is valid
+	if !inSlice(g.driver, complexKeys(apiMap)) {
+		return fmt.Errorf("Driver not valid: %s", g.driver)
+	}
+
 	token, err := g.conf.Exchange(oauth2.NoContext, code)
 	if err != nil {
-		return err
+		return fmt.Errorf("oAuth exchanged failed: %s", err.Error())
 	}
 
 	client := g.conf.Client(oauth2.NoContext, token)
@@ -123,6 +155,10 @@ func (g *Gocial) Handle(state, code string) error {
 
 	// Set the "raw" user interface
 	gUser.Raw = data
+
+	// Custom callback
+	callbackMap[g.driver](client, &gUser)
+
 	// Update the struct
 	g.User = gUser
 
@@ -157,7 +193,17 @@ func jsonDecode(js []byte) (map[string]interface{}, error) {
 	return decoded, nil
 }
 
+// Return the keys of a map
 func keys(m map[string]string) []string {
+	var keys []string
+	for k := range m {
+		keys = append(keys, k)
+	}
+
+	return keys
+}
+
+func complexKeys(m map[string]map[string]string) []string {
 	var keys []string
 	for k := range m {
 		keys = append(keys, k)
