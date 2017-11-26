@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/danilopolani/gocialite/drivers"
 	"github.com/danilopolani/gocialite/structs"
 	"golang.org/x/oauth2"
 	"gopkg.in/oleiade/reflections.v1"
@@ -22,6 +23,10 @@ type Gocial struct {
 	conf          *oauth2.Config
 	User          structs.User
 	Token         *oauth2.Token
+}
+
+func init() {
+	drivers.InitializeDrivers(RegisterNewDriver)
 }
 
 var (
