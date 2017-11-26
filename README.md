@@ -17,6 +17,7 @@ To install it, just run `go get github.com/danilopolani/gocialite` and include i
 - LinkedIn
 - Facebook
 - Google
+- Bitbucket
 
 ## Set scopes
 
