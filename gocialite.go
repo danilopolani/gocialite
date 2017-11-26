@@ -13,6 +13,7 @@ import (
 	"github.com/danilopolani/gocialite/drivers"
 	"github.com/danilopolani/gocialite/structs"
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/bitbucket"
 	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/github"
 	"golang.org/x/oauth2/google"
@@ -31,42 +32,47 @@ type Gocial struct {
 
 // Set the basic information such as the endpoint and the scopes URIs
 var apiMap = map[string]map[string]string{
-	"github":   drivers.GithubAPIMap,
-	"linkedin": drivers.LinkedInAPIMap,
-	"facebook": drivers.FacebookAPIMap,
-	"google":   drivers.GoogleAPIMap,
+	"github":    drivers.GithubAPIMap,
+	"linkedin":  drivers.LinkedInAPIMap,
+	"facebook":  drivers.FacebookAPIMap,
+	"google":    drivers.GoogleAPIMap,
+	"bitbucket": drivers.BitbucketAPIMap,
 }
 
 // Mapping to create a valid "user" struct from providers
 var userMap = map[string]map[string]string{
-	"github":   drivers.GithubUserMap,
-	"linkedin": drivers.LinkedInUserMap,
-	"facebook": drivers.FacebookUserMap,
-	"google":   drivers.GoogleUserMap,
+	"github":    drivers.GithubUserMap,
+	"linkedin":  drivers.LinkedInUserMap,
+	"facebook":  drivers.FacebookUserMap,
+	"google":    drivers.GoogleUserMap,
+	"bitbucket": drivers.BitbucketUserMap,
 }
 
 // Map correct endpoints
 var endpointMap = map[string]oauth2.Endpoint{
-	"github":   github.Endpoint,
-	"linkedin": linkedin.Endpoint,
-	"facebook": facebook.Endpoint,
-	"google":   google.Endpoint,
+	"github":    github.Endpoint,
+	"linkedin":  linkedin.Endpoint,
+	"facebook":  facebook.Endpoint,
+	"google":    google.Endpoint,
+	"bitbucket": bitbucket.Endpoint,
 }
 
 // Map custom callbacks
 var callbackMap = map[string]func(client *http.Client, u *structs.User){
-	"github":   drivers.GithubUserFn,
-	"linkedin": drivers.LinkedInUserFn,
-	"facebook": drivers.FacebookUserFn,
-	"google":   drivers.GoogleUserFn,
+	"github":    drivers.GithubUserFn,
+	"linkedin":  drivers.LinkedInUserFn,
+	"facebook":  drivers.FacebookUserFn,
+	"google":    drivers.GoogleUserFn,
+	"bitbucket": drivers.BitbucketUserFn,
 }
 
 // Default scopes for each driver
 var defaultScopesMap = map[string][]string{
-	"github":   drivers.GithubDefaultScopes,
-	"linkedin": drivers.LinkedInDefaultScopes,
-	"facebook": drivers.FacebookDefaultScopes,
-	"google":   drivers.GoogleDefaultScopes,
+	"github":    drivers.GithubDefaultScopes,
+	"linkedin":  drivers.LinkedInDefaultScopes,
+	"facebook":  drivers.FacebookDefaultScopes,
+	"google":    drivers.GoogleDefaultScopes,
+	"bitbucket": drivers.BitbucketDefaultScopes,
 }
 
 // Driver is needed to choose the correct social
