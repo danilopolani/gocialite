@@ -4,7 +4,16 @@ import (
 	"net/http"
 
 	"github.com/danilopolani/gocialite/structs"
+	"golang.org/x/oauth2/facebook"
 )
+
+const (
+	facebookdrivername = "facebook"
+)
+
+func init() {
+	registerDriver(facebookdrivername, FacebookDefaultScopes, FacebookUserFn, facebook.Endpoint, FacebookAPIMap, FacebookUserMap)
+}
 
 // FacebookUserMap is the map to create the User struct
 var FacebookUserMap = map[string]string{
