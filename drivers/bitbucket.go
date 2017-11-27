@@ -6,7 +6,16 @@ import (
 	"net/http"
 
 	"github.com/danilopolani/gocialite/structs"
+	"golang.org/x/oauth2/bitbucket"
 )
+
+const (
+	bitbucketdrivername = "bitbucket"
+)
+
+func init() {
+	registerDriver(bitbucketdrivername, BitbucketDefaultScopes, BitbucketUserFn, bitbucket.Endpoint, BitbucketAPIMap, BitbucketUserMap)
+}
 
 // BitbucketUserMap is the map to create the User struct
 var BitbucketUserMap = map[string]string{

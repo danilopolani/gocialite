@@ -13,11 +13,6 @@ import (
 	"github.com/danilopolani/gocialite/drivers"
 	"github.com/danilopolani/gocialite/structs"
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/bitbucket"
-	"golang.org/x/oauth2/facebook"
-	"golang.org/x/oauth2/github"
-	"golang.org/x/oauth2/google"
-	"golang.org/x/oauth2/linkedin"
 	"gopkg.in/oleiade/reflections.v1"
 )
 
@@ -30,49 +25,34 @@ type Gocial struct {
 	Token         *oauth2.Token
 }
 
-// Set the basic information such as the endpoint and the scopes URIs
-var apiMap = map[string]map[string]string{
-	"github":    drivers.GithubAPIMap,
-	"linkedin":  drivers.LinkedInAPIMap,
-	"facebook":  drivers.FacebookAPIMap,
-	"google":    drivers.GoogleAPIMap,
-	"bitbucket": drivers.BitbucketAPIMap,
+func init() {
+	drivers.InitializeDrivers(RegisterNewDriver)
 }
 
-// Mapping to create a valid "user" struct from providers
-var userMap = map[string]map[string]string{
-	"github":    drivers.GithubUserMap,
-	"linkedin":  drivers.LinkedInUserMap,
-	"facebook":  drivers.FacebookUserMap,
-	"google":    drivers.GoogleUserMap,
-	"bitbucket": drivers.BitbucketUserMap,
-}
+var (
+	// Set the basic information such as the endpoint and the scopes URIs
+	apiMap = map[string]map[string]string{}
 
-// Map correct endpoints
-var endpointMap = map[string]oauth2.Endpoint{
-	"github":    github.Endpoint,
-	"linkedin":  linkedin.Endpoint,
-	"facebook":  facebook.Endpoint,
-	"google":    google.Endpoint,
-	"bitbucket": bitbucket.Endpoint,
-}
+	// Mapping to create a valid "user" struct from providers
+	userMap = map[string]map[string]string{}
 
-// Map custom callbacks
-var callbackMap = map[string]func(client *http.Client, u *structs.User){
-	"github":    drivers.GithubUserFn,
-	"linkedin":  drivers.LinkedInUserFn,
-	"facebook":  drivers.FacebookUserFn,
-	"google":    drivers.GoogleUserFn,
-	"bitbucket": drivers.BitbucketUserFn,
-}
+	// Map correct endpoints
+	endpointMap = map[string]oauth2.Endpoint{}
 
-// Default scopes for each driver
-var defaultScopesMap = map[string][]string{
-	"github":    drivers.GithubDefaultScopes,
-	"linkedin":  drivers.LinkedInDefaultScopes,
-	"facebook":  drivers.FacebookDefaultScopes,
-	"google":    drivers.GoogleDefaultScopes,
-	"bitbucket": drivers.BitbucketDefaultScopes,
+	// Map custom callbacks
+	callbackMap = map[string]func(client *http.Client, u *structs.User){}
+
+	// Default scopes for each driver
+	defaultScopesMap = map[string][]string{}
+)
+
+//RegisterNewDriver adds a new driver to the existing set
+func RegisterNewDriver(driver string, defaultscopes []string, callback func(client *http.Client, u *structs.User), endpoint oauth2.Endpoint, apimap, usermap map[string]string) {
+	apiMap[driver] = apimap
+	userMap[driver] = usermap
+	endpointMap[driver] = endpoint
+	callbackMap[driver] = callback
+	defaultScopesMap[driver] = defaultscopes
 }
 
 // Driver is needed to choose the correct social

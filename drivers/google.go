@@ -4,7 +4,16 @@ import (
 	"net/http"
 
 	"github.com/danilopolani/gocialite/structs"
+	"golang.org/x/oauth2/google"
 )
+
+const (
+	googledrivername = "google"
+)
+
+func init() {
+	registerDriver(googledrivername, GoogleDefaultScopes, GoogleUserFn, google.Endpoint, GoogleAPIMap, GoogleUserMap)
+}
 
 // GoogleUserMap is the map to create the User struct
 var GoogleUserMap = map[string]string{

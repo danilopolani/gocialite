@@ -4,7 +4,16 @@ import (
 	"net/http"
 
 	"github.com/danilopolani/gocialite/structs"
+	"golang.org/x/oauth2/linkedin"
 )
+
+const (
+	linkedindrivername = "linkedin"
+)
+
+func init() {
+	registerDriver(linkedindrivername, LinkedInDefaultScopes, LinkedInUserFn, linkedin.Endpoint, LinkedInAPIMap, LinkedInUserMap)
+}
 
 // LinkedInUserMap is the map to create the User struct
 var LinkedInUserMap = map[string]string{

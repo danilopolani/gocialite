@@ -4,7 +4,16 @@ import (
 	"net/http"
 
 	"github.com/danilopolani/gocialite/structs"
+	"golang.org/x/oauth2/github"
 )
+
+const (
+	githubdrivername = "github"
+)
+
+func init() {
+	registerDriver(githubdrivername, GithubDefaultScopes, GithubUserFn, github.Endpoint, GithubAPIMap, GithubUserMap)
+}
 
 // GithubUserMap is the map to create the User struct
 var GithubUserMap = map[string]string{
