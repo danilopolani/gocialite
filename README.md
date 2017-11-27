@@ -15,11 +15,12 @@ To install it, just run `go get github.com/danilopolani/gocialite` and include i
 
 ## Available drivers
 
-- GitHub
-- LinkedIn
-- Facebook
-- Google
+- Amazon
 - Bitbucket
+- Facebook
+- Github
+- Google
+- LinkedIn
 
 ## Create new driver
 
