@@ -8,11 +8,11 @@ import (
 )
 
 const (
-	linkedindrivername = "linkedin"
+	linkedinDriverName = "linkedin"
 )
 
 func init() {
-	registerDriver(linkedindrivername, LinkedInDefaultScopes, LinkedInUserFn, linkedin.Endpoint, LinkedInAPIMap, LinkedInUserMap)
+	registerDriver(linkedinDriverName, LinkedInDefaultScopes, LinkedInUserFn, linkedin.Endpoint, LinkedInAPIMap, LinkedInUserMap)
 }
 
 // LinkedInUserMap is the map to create the User struct

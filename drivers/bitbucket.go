@@ -9,12 +9,10 @@ import (
 	"golang.org/x/oauth2/bitbucket"
 )
 
-const (
-	bitbucketdrivername = "bitbucket"
-)
+const bitbucketDriverName = "bitbucket"
 
 func init() {
-	registerDriver(bitbucketdrivername, BitbucketDefaultScopes, BitbucketUserFn, bitbucket.Endpoint, BitbucketAPIMap, BitbucketUserMap)
+	registerDriver(bitbucketDriverName, BitbucketDefaultScopes, BitbucketUserFn, bitbucket.Endpoint, BitbucketAPIMap, BitbucketUserMap)
 }
 
 // BitbucketUserMap is the map to create the User struct

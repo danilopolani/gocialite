@@ -7,12 +7,10 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
-const (
-	googledrivername = "google"
-)
+const googleDriverName = "google"
 
 func init() {
-	registerDriver(googledrivername, GoogleDefaultScopes, GoogleUserFn, google.Endpoint, GoogleAPIMap, GoogleUserMap)
+	registerDriver(googleDriverName, GoogleDefaultScopes, GoogleUserFn, google.Endpoint, GoogleAPIMap, GoogleUserMap)
 }
 
 // GoogleUserMap is the map to create the User struct

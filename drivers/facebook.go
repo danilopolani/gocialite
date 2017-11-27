@@ -7,12 +7,10 @@ import (
 	"golang.org/x/oauth2/facebook"
 )
 
-const (
-	facebookdrivername = "facebook"
-)
+const facebookDriverName = "facebook"
 
 func init() {
-	registerDriver(facebookdrivername, FacebookDefaultScopes, FacebookUserFn, facebook.Endpoint, FacebookAPIMap, FacebookUserMap)
+	registerDriver(facebookDriverName, FacebookDefaultScopes, FacebookUserFn, facebook.Endpoint, FacebookAPIMap, FacebookUserMap)
 }
 
 // FacebookUserMap is the map to create the User struct
