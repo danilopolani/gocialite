@@ -1,7 +1,9 @@
 # Gocialite
 ![Travis CI build](https://api.travis-ci.org/danilopolani/gocialite.svg?branch=master)
+![Available Drivers](https://img.shields.io/badge/Drivers-5+-orange.svg)
 [![GoDoc](https://godoc.org/github.com/danilopolani/gocialite?status.svg)](https://godoc.org/github.com/danilopolani/gocialite)
 [![GoReport](https://goreportcard.com/badge/github.com/danilopolani/gocialite)](https://goreportcard.com/report/github.com/danilopolani/gocialite)
+[GitHub contributors](https://img.shields.io/github/contributors/danilopolani/gocialite.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 Gocialite is an heavy Socialite inspired package to manage social oAuth authentication without problems.
@@ -18,6 +20,10 @@ To install it, just run `go get github.com/danilopolani/gocialite` and include i
 - Facebook
 - Google
 - Bitbucket
+
+## Create new driver
+
+Please see [Contributing page](https://github.com/danilopolani/gocialite/blob/master/CONTRIBUTING.md) to learn how to create new driver and test it.
 
 ## Set scopes
 
