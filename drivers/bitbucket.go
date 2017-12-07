@@ -1,7 +1,6 @@
 package drivers
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 
@@ -52,13 +51,3 @@ var BitbucketUserFn = func(client *http.Client, u *structs.User) {
 
 // BitbucketDefaultScopes contains the default scopes
 var BitbucketDefaultScopes = []string{"account", "email"}
-
-// Decode a json or return an error
-func jsonDecode(js []byte) (map[string]interface{}, error) {
-	var decoded map[string]interface{}
-	if err := json.Unmarshal(js, &decoded); err != nil {
-		return nil, err
-	}
-
-	return decoded, nil
-}

@@ -21,6 +21,7 @@ To install it, just run `go get github.com/danilopolani/gocialite` and include i
 - Github
 - Google
 - LinkedIn
+- Slack
 
 ## Create new driver
 
