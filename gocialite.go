@@ -60,7 +60,9 @@ func (g *Gocial) Driver(driver string) *Gocial {
 	g.driver = driver
 	g.scopes = defaultScopesMap[driver]
 
-	g.state = randToken()
+	if g.state == "" {
+		g.state = randToken()
+	}
 
 	return g
 }
