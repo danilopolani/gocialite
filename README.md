@@ -146,4 +146,4 @@ func callbackHandler(c *gin.Context) {
 }
 ```
 
-Please take a look to [example](https://github.com/danilopolani/gocialite/wiki/Example) for a full working code with Gin Tonic and variable provider handler.
+Please take a look to [multi provider example](https://github.com/danilopolani/gocialite/wiki/Multi-provider-example) for a full working code with Gin Tonic and variable provider handler.
