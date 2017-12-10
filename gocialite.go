@@ -9,12 +9,49 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 
 	"github.com/danilopolani/gocialite/drivers"
 	"github.com/danilopolani/gocialite/structs"
 	"golang.org/x/oauth2"
 	"gopkg.in/oleiade/reflections.v1"
 )
+
+// Dispatcher allows to safely issue concurrent Gocials
+type Dispatcher struct {
+	mu sync.RWMutex
+	g  map[string]*Gocial
+}
+
+// NewDispatcher creates new Dispatcher
+func NewDispatcher() *Dispatcher {
+	return &Dispatcher{g: make(map[string]*Gocial)}
+}
+
+// New Gocial instance
+func (d *Dispatcher) New() *Gocial {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	state := randToken()
+	g := &Gocial{state: state}
+	d.g[state] = g
+	return g
+}
+
+// Handle callback. Can be called only once for given state.
+func (d *Dispatcher) Handle(state, code string) (*structs.User, *oauth2.Token, error) {
+	d.mu.RLock()
+	g, ok := d.g[state]
+	d.mu.RUnlock()
+	if !ok {
+		return nil, nil, fmt.Errorf("invalid CSRF token: %s", state)
+	}
+	err := g.Handle(state, code)
+	d.mu.Lock()
+	delete(d.g, state)
+	d.mu.Unlock()
+	return &g.User, g.Token, err
+}
 
 // Gocial is the main struct of the package
 type Gocial struct {
@@ -60,6 +97,8 @@ func (g *Gocial) Driver(driver string) *Gocial {
 	g.driver = driver
 	g.scopes = defaultScopesMap[driver]
 
+	// BUG: sequential usage of single Gocial instance will have same CSRF token. This is serious security issue.
+	// NOTE: Dispatcher eliminates this bug.
 	if g.state == "" {
 		g.state = randToken()
 	}
