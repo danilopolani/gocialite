@@ -48,6 +48,8 @@ var gocial gocialite.Gocial
 gocial.Driver("facebook")
 ```
 
+The driver name will be the provider name in lowercase.
+
 ## How to use it
 
 **Note**: All Gocialite methods are chainable.
@@ -127,9 +129,10 @@ func callbackHandler(c *gin.Context) {
 	// Retrieve query params for code and state
 	code := c.Query("code")
 	state := c.Query("state")
+	provider := c.Param("provider")
 
 	// Handle callback and check for errors
-	err := gocial.Handle(state, code)
+	err := gocial.Driver(provider).Handle(state, code)
 	if err != nil {
 		c.Writer.Write([]byte("Error: " + err.Error()))
 		return
