@@ -61,7 +61,7 @@ import (
 	...
 )
 
-var gocial gocialite.Gocial
+var gocial = gocialite.NewDispatcher()
 
 func main() {
 ```
@@ -85,7 +85,8 @@ func main() {
 
 // Redirect to correct oAuth URL
 func redirectHandler(c *gin.Context) {
-	authURL := gocial.Driver("github"). // Set provider
+	authURL := gocial.New().
+		Driver("github"). // Set provider
 		Scopes([]string{"public_repo"}). // Set optional scope(s)
 		Redirect( // 
 			"xxxxxxxxxxxxxx", // Client ID
@@ -129,10 +130,9 @@ func callbackHandler(c *gin.Context) {
 	// Retrieve query params for code and state
 	code := c.Query("code")
 	state := c.Query("state")
-	provider := c.Param("provider")
 
 	// Handle callback and check for errors
-	err := gocial.Driver(provider).Handle(state, code)
+	err := gocial.Handle(state, code)
 	if err != nil {
 		c.Writer.Write([]byte("Error: " + err.Error()))
 		return
@@ -147,3 +147,10 @@ func callbackHandler(c *gin.Context) {
 ```
 
 Please take a look to [multi provider example](https://github.com/danilopolani/gocialite/wiki/Multi-provider-example) for a full working code with Gin Tonic and variable provider handler.
+
+## Contributors
+
+- [Danilo Polani](https://github.com/danilopolani)
+- [Joseph Buchma](https://github.com/josephbuchma)
+- [Mark Beznos](https://github.com/vibbix)
+- [Davor Kapsa](https://github.com/dvrkps)
