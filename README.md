@@ -34,8 +34,7 @@ When you use the following method, you don't have to rewrite them.
 
 Use the `Scopes([]string)` method of your `Gocial` instance. Example:
 
-```
-var gocial gocialite.Gocial
+```go
 gocial.Scopes([]string{"public_repo"})
 ```
 
@@ -43,8 +42,7 @@ gocial.Scopes([]string{"public_repo"})
 
 Use the `Driver(string)` method of your `Gocial` instance. Example:
 
-```
-var gocial gocialite.Gocial
+```go
 gocial.Driver("facebook")
 ```
 
