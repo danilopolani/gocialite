@@ -56,6 +56,7 @@ func (d *Dispatcher) Handle(state, code string) (*structs.User, *oauth2.Token, e
 // Gocial is the main struct of the package
 type Gocial struct {
 	driver, state string
+	baseURL       string
 	scopes        []string
 	conf          *oauth2.Config
 	User          structs.User
@@ -112,6 +113,12 @@ func (g *Gocial) Scopes(scopes []string) *Gocial {
 	return g
 }
 
+// BaseURL is used to set the base URL of endpoints
+func (g *Gocial) BaseURL(url string) *Gocial {
+	g.baseURL = url
+	return g
+}
+
 // Redirect returns an URL for the selected social oAuth login
 func (g *Gocial) Redirect(clientID, clientSecret, redirectURL string) (string, error) {
 	// Check if driver is valid
@@ -120,12 +127,20 @@ func (g *Gocial) Redirect(clientID, clientSecret, redirectURL string) (string, e
 	}
 
 	// Check if valid redirectURL
-	_, err := url.ParseRequestURI(redirectURL)
+	err := validURL(redirectURL)
 	if err != nil {
-		return "", fmt.Errorf("Redirect URL <%s> not valid: %s", redirectURL, err.Error())
+		return "", err
 	}
-	if !strings.HasPrefix(redirectURL, "http://") && !strings.HasPrefix(redirectURL, "https://") {
-		return "", fmt.Errorf("Redirect URL <%s> not valid: protocol not valid", redirectURL)
+
+	// If auth0, baseURL is required
+	if g.driver == "auth0" && validURL(g.baseURL) != nil {
+		return "", fmt.Errorf("a BaseURL is required for Auth0. Please use the BaseURL() method to set one")
+	}
+
+	oAuthEndpoint := endpointMap[g.driver]
+	if g.driver == "auth0" {
+		oAuthEndpoint.AuthURL = g.baseURL+oAuthEndpoint.AuthURL
+		oAuthEndpoint.TokenURL = g.baseURL+oAuthEndpoint.TokenURL
 	}
 
 	g.conf = &oauth2.Config{
@@ -133,7 +148,7 @@ func (g *Gocial) Redirect(clientID, clientSecret, redirectURL string) (string, e
 		ClientSecret: clientSecret,
 		RedirectURL:  redirectURL,
 		Scopes:       g.scopes,
-		Endpoint:     endpointMap[g.driver],
+		Endpoint:     oAuthEndpoint,
 	}
 
 	return g.conf.AuthCodeURL(g.state), nil
@@ -149,6 +164,11 @@ func (g *Gocial) Handle(state, code string) error {
 	// Check if driver is valid
 	if !inSlice(g.driver, complexKeys(apiMap)) {
 		return fmt.Errorf("Driver not valid: %s", g.driver)
+	}
+
+	// If auth0, baseURL is required
+	if g.driver == "auth0" && validURL(g.baseURL) != nil {
+		return fmt.Errorf("a BaseURL is required for Auth0. Please use the BaseURL() method to set one")
 	}
 
 	token, err := g.conf.Exchange(oauth2.NoContext, code)
@@ -248,4 +268,16 @@ func complexKeys(m map[string]map[string]string) []string {
 	}
 
 	return keys
+}
+
+func validURL(u string) error {
+	_, err := url.ParseRequestURI(u)
+	if err != nil {
+		return fmt.Errorf("Redirect URL <%s> not valid: %s", u, err.Error())
+	}
+	if !strings.HasPrefix(u, "http://") && !strings.HasPrefix(u, "https://") {
+		return fmt.Errorf("Redirect URL <%s> not valid: protocol not valid", u)
+	}
+
+	return nil
 }
