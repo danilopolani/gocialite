@@ -164,9 +164,10 @@ func (g *Gocial) Handle(state, code string) error {
 	// Retrieve all from scopes
 	driverAPIMap := apiMap[g.driver]
 	driverUserMap := userMap[g.driver]
+	userEndpoint := strings.Replace(driverAPIMap["userEndpoint"], "%ACCESS_TOKEN", token.AccessToken, -1)
 
 	// Get user info
-	req, err := client.Get(driverAPIMap["endpoint"] + driverAPIMap["userEndpoint"])
+	req, err := client.Get(driverAPIMap["endpoint"] + userEndpoint)
 	if err != nil {
 		return err
 	}

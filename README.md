@@ -18,6 +18,7 @@ To install it, just run `go get github.com/danilopolani/gocialite` and include i
 - Amazon
 - Bitbucket
 - Facebook
+- Foursquare
 - Github
 - Google
 - LinkedIn
