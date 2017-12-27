@@ -84,7 +84,7 @@ func main() {
 
 // Redirect to correct oAuth URL
 func redirectHandler(c *gin.Context) {
-	authURL := gocial.New().
+	authURL, err := gocial.New().
 		Driver("github"). // Set provider
 		Scopes([]string{"public_repo"}). // Set optional scope(s)
 		Redirect( // 
@@ -92,6 +92,12 @@ func redirectHandler(c *gin.Context) {
 			"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", // Client Secret
 			"http://localhost:9090/auth/github/callback", // Redirect URL
 		)
+
+	// Check for errors (usually driver not valid)
+	if err != nil {
+		c.Writer.Write([]byte("Error: " + err.Error()))
+		return
+	}
 
 	// Redirect with authURL
 	c.Redirect(http.StatusFound, authURL) // Redirect with 302 HTTP code
