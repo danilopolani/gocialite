@@ -16,6 +16,7 @@ To install it, just run `go get gopkg.in/danilopolani/gocialite.v0` and include 
 ## Available drivers
 
 - Amazon
+- Asana
 - Bitbucket
 - Facebook
 - Foursquare
