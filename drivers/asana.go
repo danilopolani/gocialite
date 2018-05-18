@@ -31,12 +31,15 @@ var AsanaAPIMap = map[string]string{
 
 // AsanaUserFn is a callback to parse additional fields for User
 var AsanaUserFn = func(client *http.Client, u *structs.User) {
-  u.ID = fmt.Sprintf("%.0f", u.Raw["data"].(map[string]interface{})["id"].(float64))
-  u.Email = u.Raw["data"].(map[string]interface{})["email"].(string)
-  u.FullName = u.Raw["data"].(map[string]interface{})["name"].(string)
+  userData := u.Raw["data"].(map[string]interface{})
+  u.ID = fmt.Sprintf("%.0f", userData["id"].(float64))
+  u.Email = userData["email"].(string)
+  u.FullName = userData["name"].(string)
 
 	// Set avatar
-	u.Avatar = u.Raw["data"].(map[string]interface{})["photo"].(map[string]interface{})["image_1024x1024"].(string)
+  if (userData["photo"] != nil) { 
+	 u.Avatar = userData["photo"].(map[string]interface{})["image_1024x1024"].(string)
+  }
 }
 
 // AsanaDefaultScopes contains the default scopes
