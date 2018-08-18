@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/danilopolani/gocialite/drivers/option"
 	"github.com/danilopolani/gocialite/structs"
 	"golang.org/x/oauth2/vk"
 )
@@ -13,14 +14,17 @@ import (
 const vkDriverName = "vk"
 
 func init() {
-	registerDriver(
-		vkDriverName,
-		vkDefaultScopes,
-		vkUserFn,
-		vk.Endpoint,
-		vkAPIMap,
-		vkUserMap,
+	err := RegisterDriver(
+		option.Driver(vkDriverName),
+		option.DefaultScopes(vkDefaultScopes),
+		option.Callback(vkUserFn),
+		option.Endpoint(vk.Endpoint),
+		option.APIMap(vkAPIMap),
+		option.UserMap(vkUserMap),
 	)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // vkUserMap is the map to create the User struct

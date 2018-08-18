@@ -3,6 +3,7 @@ package drivers
 import (
 	"net/http"
 
+	"github.com/danilopolani/gocialite/drivers/option"
 	"github.com/danilopolani/gocialite/structs"
 	"golang.org/x/oauth2/linkedin"
 )
@@ -12,7 +13,17 @@ const (
 )
 
 func init() {
-	registerDriver(linkedinDriverName, LinkedInDefaultScopes, LinkedInUserFn, linkedin.Endpoint, LinkedInAPIMap, LinkedInUserMap)
+	err := RegisterDriver(
+		option.Driver(linkedinDriverName),
+		option.DefaultScopes(LinkedInDefaultScopes),
+		option.Callback(LinkedInUserFn),
+		option.Endpoint(linkedin.Endpoint),
+		option.APIMap(LinkedInAPIMap),
+		option.UserMap(LinkedInUserMap),
+	)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // LinkedInUserMap is the map to create the User struct

@@ -3,6 +3,7 @@ package drivers
 import (
 	"net/http"
 
+	"github.com/danilopolani/gocialite/drivers/option"
 	"github.com/danilopolani/gocialite/structs"
 	"golang.org/x/oauth2/foursquare"
 )
@@ -10,7 +11,17 @@ import (
 const foursquareDriverName = "foursquare"
 
 func init() {
-	registerDriver(foursquareDriverName, FoursquareDefaultScopes, FoursquareUserFn, foursquare.Endpoint, FoursquareAPIMap, FoursquareUserMap)
+	err := RegisterDriver(
+		option.Driver(foursquareDriverName),
+		option.DefaultScopes(FoursquareDefaultScopes),
+		option.Callback(FoursquareUserFn),
+		option.Endpoint(foursquare.Endpoint),
+		option.APIMap(FoursquareAPIMap),
+		option.UserMap(FoursquareUserMap),
+	)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // FoursquareUserMap is the map to create the User struct

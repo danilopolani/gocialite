@@ -3,6 +3,7 @@ package drivers
 import (
 	"net/http"
 
+	"github.com/danilopolani/gocialite/drivers/option"
 	"github.com/danilopolani/gocialite/structs"
 	"golang.org/x/oauth2/github"
 )
@@ -10,7 +11,17 @@ import (
 const githubDriverName = "github"
 
 func init() {
-	registerDriver(githubDriverName, GithubDefaultScopes, GithubUserFn, github.Endpoint, GithubAPIMap, GithubUserMap)
+	err := RegisterDriver(
+		option.Driver(githubDriverName),
+		option.DefaultScopes(GithubDefaultScopes),
+		option.Callback(GithubUserFn),
+		option.Endpoint(github.Endpoint),
+		option.APIMap(GithubAPIMap),
+		option.UserMap(GithubUserMap),
+	)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // GithubUserMap is the map to create the User struct

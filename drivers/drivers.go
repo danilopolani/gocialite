@@ -1,34 +1,40 @@
+// Package drivers is a singleton for drivers
 package drivers
 
 import (
 	"encoding/json"
-	"net/http"
 
-	"github.com/danilopolani/gocialite/structs"
-	"golang.org/x/oauth2"
+	"github.com/danilopolani/gocialite/drivers/option"
 )
 
-var (
-	initAPIMap           = map[string]map[string]string{}
-	initUserMap          = map[string]map[string]string{}
-	initEndpointMap      = map[string]oauth2.Endpoint{}
-	initCallbackMap      = map[string]func(client *http.Client, u *structs.User){}
-	initDefaultScopesMap = map[string][]string{}
-)
+var drivers = make(map[string]*option.Options)
 
-func registerDriver(driver string, defaultscopes []string, callback func(client *http.Client, u *structs.User), endpoint oauth2.Endpoint, apimap, usermap map[string]string) {
-	initAPIMap[driver] = apimap
-	initUserMap[driver] = usermap
-	initEndpointMap[driver] = endpoint
-	initCallbackMap[driver] = callback
-	initDefaultScopesMap[driver] = defaultscopes
+// RegisterDriver adds a new driver to the existing set
+func RegisterDriver(setters ...option.Setter) error {
+	info := option.Options{}
+	for _, s := range setters {
+		s(&info)
+	}
+	if err := info.Validate(); err != nil {
+		return err
+	}
+
+	drivers[info.Driver()] = &info
+	return nil
 }
 
-// InitializeDrivers adds all the drivers to the register func
-func InitializeDrivers(register func(driver string, defaultscopes []string, callback func(client *http.Client, u *structs.User), endpoint oauth2.Endpoint, apimap, usermap map[string]string)) {
-	for k := range initAPIMap {
-		register(k, initDefaultScopesMap[k], initCallbackMap[k], initEndpointMap[k], initAPIMap[k], initUserMap[k])
+// Driver returns options of driver
+func Driver(name string) (o option.Options, ok bool) {
+	if opt, ok := drivers[name]; opt != nil && ok {
+		return *opt, true
 	}
+	return option.Options{}, false
+}
+
+// MustDriver returns options of driver
+func MustDriver(name string) option.Options {
+	opt, _ := Driver(name)
+	return opt
 }
 
 // Decode a json or return an error

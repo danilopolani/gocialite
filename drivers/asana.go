@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/danilopolani/gocialite/drivers/option"
 	"github.com/danilopolani/gocialite/structs"
 	"golang.org/x/oauth2"
 )
@@ -11,7 +12,17 @@ import (
 const asanaDriverName = "asana"
 
 func init() {
-	registerDriver(asanaDriverName, AsanaDefaultScopes, AsanaUserFn, AsanaEndpoint, AsanaAPIMap, AsanaUserMap)
+	err := RegisterDriver(
+		option.Driver(asanaDriverName),
+		option.DefaultScopes(AsanaDefaultScopes),
+		option.Callback(AsanaUserFn),
+		option.Endpoint(AsanaEndpoint),
+		option.APIMap(AsanaAPIMap),
+		option.UserMap(AsanaUserMap),
+	)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // AsanaEndpoint is the oAuth endpoint

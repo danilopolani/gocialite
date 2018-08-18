@@ -3,6 +3,7 @@ package drivers
 import (
 	"net/http"
 
+	"github.com/danilopolani/gocialite/drivers/option"
 	"github.com/danilopolani/gocialite/structs"
 	"golang.org/x/oauth2/amazon"
 )
@@ -10,7 +11,17 @@ import (
 const amazonDriverName = "amazon"
 
 func init() {
-	registerDriver(amazonDriverName, AmazonDefaultScopes, AmazonUserFn, amazon.Endpoint, AmazonAPIMap, AmazonUserMap)
+	err := RegisterDriver(
+		option.Driver(amazonDriverName),
+		option.DefaultScopes(AmazonDefaultScopes),
+		option.Callback(AmazonUserFn),
+		option.Endpoint(amazon.Endpoint),
+		option.APIMap(AmazonAPIMap),
+		option.UserMap(AmazonUserMap),
+	)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // AmazonUserMap is the map to create the User struct
