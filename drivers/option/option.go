@@ -13,7 +13,11 @@ import (
 type CallbackFunc func(client *http.Client, u *structs.User)
 
 // SigFunc is a function for signature calculation
-type SigFunc func() string
+type SigFunc func(
+	conf *oauth2.Config,
+	tok *oauth2.Token,
+	params map[string]string,
+) string
 
 // RegisterFunc is function for driver registration
 type RegisterFunc func(info Options)
@@ -108,6 +112,7 @@ func UserMap(userMap map[string]string) Setter {
 }
 
 // Sig option setter
+// you can use %SIG in a userEndpoint
 func Sig(sig SigFunc) Setter {
 	return func(info *Options) { info.sig = sig }
 }

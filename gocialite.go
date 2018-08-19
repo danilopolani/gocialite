@@ -35,6 +35,7 @@ func (d *Dispatcher) New() *Gocial {
 	defer d.mu.Unlock()
 	state := randToken()
 	g := &Gocial{state: state}
+	g.params = make(map[string]string)
 	d.g[state] = g
 	return g
 }
@@ -61,6 +62,7 @@ type Gocial struct {
 	conf          *oauth2.Config
 	User          structs.User
 	Token         *oauth2.Token
+	params        map[string]string
 }
 
 // RegisterNewDriver adds a new driver to the existing set
@@ -99,6 +101,16 @@ func (g *Gocial) Driver(driver string) *Gocial {
 // Scopes is used to set the oAuth scopes, for example "user", "calendar"
 func (g *Gocial) Scopes(scopes []string) *Gocial {
 	g.scopes = append(g.scopes, scopes...)
+	return g
+}
+
+// Params is used to set additional parameters for driver
+// for exapmle: APPLICATION_KEY for OK driver
+func (g *Gocial) Params(params map[string]string) *Gocial {
+	g.params = make(map[string]string)
+	for p, v := range params {
+		g.params["%"+p] = strings.ToUpper(v)
+	}
 	return g
 }
 
@@ -157,7 +169,14 @@ func (g *Gocial) Handle(state, code string) error {
 	// Retrieve all from scopes
 	driverAPIMap := drv.APIMap()
 	driverUserMap := drv.UserMap()
-	userEndpoint := strings.Replace(driverAPIMap["userEndpoint"], "%ACCESS_TOKEN", token.AccessToken, -1)
+	userEndpoint := driverAPIMap["userEndpoint"]
+	g.params["%ACCESS_TOKEN"] = token.AccessToken
+	if drv.Sig() != nil {
+		g.params["%SIG"] = drv.Sig()(g.conf, g.Token, g.params)
+	}
+	for p, v := range g.params {
+		userEndpoint = strings.Replace(userEndpoint, p, v, -1)
+	}
 
 	// Get user info
 	req, err := client.Get(driverAPIMap["endpoint"] + userEndpoint)
