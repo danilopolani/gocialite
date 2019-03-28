@@ -1,6 +1,7 @@
 package drivers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/danilopolani/gocialite/structs"
@@ -24,12 +25,36 @@ var GithubUserMap = map[string]string{
 
 // GithubAPIMap is the map for API endpoints
 var GithubAPIMap = map[string]string{
-	"endpoint":     "https://api.github.com",
-	"userEndpoint": "/user",
+	"endpoint":      "https://api.github.com",
+	"userEndpoint":  "/user",
+	"emailEndpoint": "/user/emails",
 }
 
 // GithubUserFn is a callback to parse additional fields for User
-var GithubUserFn = func(client *http.Client, u *structs.User) {}
+var GithubUserFn = func(client *http.Client, u *structs.User) {
+	// Used to parse the email from response
+	type additionalEmail struct {
+		Email string `json:"email"`
+	}
+	var email []additionalEmail
+
+	// Email can be nil because of the "keep my email private" setting
+	if u.Email == "<nil>" {
+		// Retrieve email
+		req, err := client.Get(GithubAPIMap["endpoint"] + GithubAPIMap["emailEndpoint"])
+		if err != nil {
+			return
+		}
+
+		defer req.Body.Close()
+		err = json.NewDecoder(req.Body).Decode(&email)
+		if err != nil {
+			return
+		}
+
+		u.Email = email[0].Email
+	}
+}
 
 // GithubDefaultScopes contains the default scopes
-var GithubDefaultScopes = []string{}
+var GithubDefaultScopes = []string{"user:email"}
