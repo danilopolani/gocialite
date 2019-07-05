@@ -225,10 +225,13 @@ func inSlice(v string, s []string) bool {
 // Decode a json or return an error
 func jsonDecode(js []byte) (map[string]interface{}, error) {
 	var decoded map[string]interface{}
-	if err := json.Unmarshal(js, &decoded); err != nil {
+	decoder := json.NewDecoder(strings.NewReader(string(js)))
+	decoder.UseNumber()
+
+	if err := decoder.Decode(&decoded); err != nil {
 		return nil, err
 	}
-
+	
 	return decoded, nil
 }
 
