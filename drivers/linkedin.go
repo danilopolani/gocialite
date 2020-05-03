@@ -18,7 +18,9 @@ func init() {
 
 // LinkedInUserMap is the map to create the User struct
 var LinkedInUserMap = map[string]string{
-    "id": "ID",
+    "id":                 "ID",
+    "localizedFirstName": "FirstName",
+    "localizedLastName":  "LastName",
 }
 
 // LinkedInAPIMap is the map for API endpoints
@@ -30,38 +32,7 @@ var LinkedInAPIMap = map[string]string{
 
 // LinkedInUserFn is a callback to parse additional fields for User
 var LinkedInUserFn = func(client *http.Client, u *structs.User) {
-    /*
-       {
-          "id":"REDACTED",
-          "firstName":{
-             "localized":{
-                "en_US":"Tina"
-             },
-             "preferredLocale":{
-                "country":"US",
-                "language":"en"
-             }
-          },
-          "lastName":{
-             "localized":{
-                "en_US":"Belcher"
-             },
-             "preferredLocale":{
-                "country":"US",
-                "language":"en"
-             }
-          },
-           "profilePicture": {
-               "displayImage": "urn:li:digitalmediaAsset:B54328XZFfe2134zTyq"
-           }
-       }
-    */
-    raw := u.Raw
-    if raw != nil {
-        u.FirstName = raw["localizedFirstName"].(string)
-        u.LastName = raw["localizedLastName"].(string)
-    }
-
+    u.FullName = u.FirstName + " " + u.LastName
     // Retrieve email
     req, err := client.Get(LinkedInAPIMap["endpoint"] + LinkedInAPIMap["emailEndpoint"])
     if err != nil {
