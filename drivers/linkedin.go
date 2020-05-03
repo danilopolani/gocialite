@@ -57,15 +57,17 @@ var LinkedInUserFn = func(client *http.Client, u *structs.User) {
            }
        }
     */
-    raw := u.Raw["data"].(map[string]map[string]map[string]string)
-    fn := raw["firstName"]
-    u.FirstName = fn["localized"][fmt.Sprintf("%s_%s", fn["preferredLocale"]["language"],
-        fn["preferredLocale"]["country"])]
-    ln := raw["lastName"]
-    u.LastName = ln["localized"][fmt.Sprintf("%s_%s", ln["preferredLocale"]["language"],
-        ln["preferredLocale"]["country"])]
-    av := raw["profilePicture"]
-    u.Avatar = av["profilePicture"]["displayImage"]
+    raw := u.Raw
+    if raw != nil {
+        fn := raw["firstName"].(map[string]map[string]string)
+        u.FirstName = fn["localized"][fmt.Sprintf("%s_%s", fn["preferredLocale"]["language"],
+            fn["preferredLocale"]["country"])]
+        ln := raw["lastName"].(map[string]map[string]string)
+        u.LastName = ln["localized"][fmt.Sprintf("%s_%s", ln["preferredLocale"]["language"],
+            ln["preferredLocale"]["country"])]
+        av := raw["profilePicture"].(map[string]map[string]string)
+        u.Avatar = av["profilePicture"]["displayImage"]
+    }
 
     // Retrieve email
     req, err := client.Get(LinkedInAPIMap["endpoint"] + LinkedInAPIMap["emailEndpoint"])
