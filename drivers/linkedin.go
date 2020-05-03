@@ -30,11 +30,11 @@ var LinkedInUserMap = map[string]string{
 var LinkedInAPIMap = map[string]string{
 	"endpoint":     "https://api.linkedin.com",
 	"userEndpoint": "/v2/me",
-	"emailEndpoint": "/v2/clientAwareMemberHandles?q=members&projection=(elements*(primary,type,handle~))",
+	"emailEndpoint": "/v2/emailAddress?q=members&projection=(elements*(handle~))",
 }
 
 // LinkedInUserFn is a callback to parse additional fields for User
 var LinkedInUserFn = func(client *http.Client, u *structs.User) {}
 
 // LinkedInDefaultScopes contains the default scopes
-var LinkedInDefaultScopes = []string{}
+var LinkedInDefaultScopes = []string{"r_emailaddress", "r_liteprofile", "w_member_social"}
