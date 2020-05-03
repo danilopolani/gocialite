@@ -2,7 +2,6 @@ package drivers
 
 import (
     "encoding/json"
-    "fmt"
     "net/http"
 
     "github.com/danilopolani/gocialite/structs"
@@ -59,16 +58,8 @@ var LinkedInUserFn = func(client *http.Client, u *structs.User) {
     */
     raw := u.Raw
     if raw != nil {
-        fn := raw["firstName"].(map[string]interface{})
-        localized := fn["localized"].(map[string]interface{})
-        preferredLocale := fn["preferredLocale"].(map[string]interface{})
-        u.FirstName = localized[fmt.Sprintf("%s_%s", preferredLocale["language"],
-            preferredLocale["country"])].(string)
-        ln := raw["lastName"].(map[string]interface{})
-        localized = ln["localized"].(map[string]interface{})
-        preferredLocale = ln["preferredLocale"].(map[string]interface{})
-        u.LastName = localized[fmt.Sprintf("%s_%s", preferredLocale["language"],
-            preferredLocale["country"])].(string)
+        u.FirstName = raw["localizedFirstName"].(string)
+        u.LastName = raw["localizedLastName"].(string)
     }
 
     // Retrieve email
@@ -91,8 +82,7 @@ var LinkedInUserFn = func(client *http.Client, u *structs.User) {
         return
     }
 
-    fmt.Printf("%+v", email)
-    // u.Email = email.Handle.EmailAddress
+    u.Email = email["elements"].(map[string]interface{})["handle~"].(map[string]interface{})["emailAddress"].(string)
 
 }
 
