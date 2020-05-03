@@ -69,8 +69,6 @@ var LinkedInUserFn = func(client *http.Client, u *structs.User) {
         preferredLocale = ln["preferredLocale"].(map[string]interface{})
         u.LastName = localized[fmt.Sprintf("%s_%s", preferredLocale["language"],
             preferredLocale["country"])].(string)
-        av := raw["profilePicture"].(map[string]interface{})
-        u.Avatar = av["displayImage"].(string)
     }
 
     // Retrieve email
@@ -87,18 +85,14 @@ var LinkedInUserFn = func(client *http.Client, u *structs.User) {
            }
        }
     */
-    type EmailRes struct {
-        Handle struct {
-            EmailAddress string `json:"emailAddress"`
-        } `json:"handle~"`
-    }
-    email := new(EmailRes)
+    email := make(map[string]interface{})
     err = json.NewDecoder(req.Body).Decode(&email)
     if err != nil {
         return
     }
 
-    u.Email = email.Handle.EmailAddress
+    fmt.Printf("%+v", email)
+    // u.Email = email.Handle.EmailAddress
 
 }
 
