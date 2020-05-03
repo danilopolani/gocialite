@@ -57,6 +57,7 @@ var LinkedInUserFn = func(client *http.Client, u *structs.User) {
            }
        }
     */
+    fmt.Printf("%+v", u.Raw)
     raw := u.Raw
     if raw != nil {
         fn := raw["firstName"].(map[string]map[string]string)
