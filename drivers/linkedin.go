@@ -69,8 +69,8 @@ var LinkedInUserFn = func(client *http.Client, u *structs.User) {
         preferredLocale = ln["preferredLocale"].(map[string]interface{})
         u.LastName = localized[fmt.Sprintf("%s_%s", preferredLocale["language"],
             preferredLocale["country"])].(string)
-        av := raw["profilePicture"].(map[string]string)
-        u.Avatar = av["displayImage"]
+        av := raw["profilePicture"].(map[string]interface{})
+        u.Avatar = av["displayImage"].(string)
     }
 
     // Retrieve email
