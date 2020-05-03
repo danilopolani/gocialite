@@ -60,15 +60,15 @@ var LinkedInUserFn = func(client *http.Client, u *structs.User) {
     raw := u.Raw
     if raw != nil {
         fn := raw["firstName"].(map[string]interface{})
-        localized := fn["localized"].(map[string]string)
-        preferredLocale := fn["preferredLocale"].(map[string]string)
+        localized := fn["localized"].(map[string]interface{})
+        preferredLocale := fn["preferredLocale"].(map[string]interface{})
         u.FirstName = localized[fmt.Sprintf("%s_%s", preferredLocale["language"],
-            preferredLocale["country"])]
+            preferredLocale["country"])].(string)
         ln := raw["lastName"].(map[string]interface{})
-        localized = ln["localized"].(map[string]string)
-        preferredLocale = ln["preferredLocale"].(map[string]string)
+        localized = ln["localized"].(map[string]interface{})
+        preferredLocale = ln["preferredLocale"].(map[string]interface{})
         u.LastName = localized[fmt.Sprintf("%s_%s", preferredLocale["language"],
-            preferredLocale["country"])]
+            preferredLocale["country"])].(string)
         av := raw["profilePicture"].(map[string]string)
         u.Avatar = av["displayImage"]
     }
