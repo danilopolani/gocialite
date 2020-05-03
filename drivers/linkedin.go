@@ -1,6 +1,8 @@
 package drivers
 
 import (
+    "encoding/json"
+    "fmt"
     "net/http"
 
     "github.com/danilopolani/gocialite/structs"
@@ -17,10 +19,7 @@ func init() {
 
 // LinkedInUserMap is the map to create the User struct
 var LinkedInUserMap = map[string]string{
-    "id":            "ID",
-    "firstName":     "FirstName",
-    "lastName":      "LastName",
-    "profilePicture":    "Avatar",
+    "id": "ID",
 }
 
 // LinkedInAPIMap is the map for API endpoints
@@ -58,15 +57,18 @@ var LinkedInUserFn = func(client *http.Client, u *structs.User) {
            }
        }
     */
-    u.FirstName = u.FirstName["localized"][fmt.Sprintf("%s_%s", u.FirstName["preferredLocale"]["language"],
-        u.FirstName["preferredLocale"]["country"])]
-    u.LastName = u.LastName["localized"][fmt.Sprintf("%s_%s", u.LastName["preferredLocale"]["language"],
-        u.LastName["preferredLocale"]["country"])]
-
-    u.Avatar = u.Avatar["profilePicture"]["displayImage"]
+    raw := u.Raw["data"].(map[string]map[string]map[string]string)
+    fn := raw["firstName"]
+    u.FirstName = fn["localized"][fmt.Sprintf("%s_%s", fn["preferredLocale"]["language"],
+        fn["preferredLocale"]["country"])]
+    ln := raw["lastName"]
+    u.LastName = ln["localized"][fmt.Sprintf("%s_%s", ln["preferredLocale"]["language"],
+        ln["preferredLocale"]["country"])]
+    av := raw["profilePicture"]
+    u.Avatar = av["profilePicture"]["displayImage"]
 
     // Retrieve email
-    req, err := client.Get(LinkedinAPIMap["endpoint"] + LinkedinAPIMap["emailEndpoint"])
+    req, err := client.Get(LinkedInAPIMap["endpoint"] + LinkedInAPIMap["emailEndpoint"])
     if err != nil {
         return
     }
