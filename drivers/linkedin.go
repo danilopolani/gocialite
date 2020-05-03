@@ -57,17 +57,20 @@ var LinkedInUserFn = func(client *http.Client, u *structs.User) {
            }
        }
     */
-    fmt.Printf("%+v", u.Raw)
     raw := u.Raw
     if raw != nil {
-        fn := raw["firstName"].(map[string]map[string]string)
-        u.FirstName = fn["localized"][fmt.Sprintf("%s_%s", fn["preferredLocale"]["language"],
-            fn["preferredLocale"]["country"])]
-        ln := raw["lastName"].(map[string]map[string]string)
-        u.LastName = ln["localized"][fmt.Sprintf("%s_%s", ln["preferredLocale"]["language"],
-            ln["preferredLocale"]["country"])]
-        av := raw["profilePicture"].(map[string]map[string]string)
-        u.Avatar = av["profilePicture"]["displayImage"]
+        fn := raw["firstName"].(map[string]interface{})
+        localized := fn["localized"].(map[string]string)
+        preferredLocale := fn["preferredLocale"].(map[string]string)
+        u.FirstName = localized[fmt.Sprintf("%s_%s", preferredLocale["language"],
+            preferredLocale["country"])]
+        ln := raw["lastName"].(map[string]interface{})
+        localized = ln["localized"].(map[string]string)
+        preferredLocale = ln["preferredLocale"].(map[string]string)
+        u.LastName = localized[fmt.Sprintf("%s_%s", preferredLocale["language"],
+            preferredLocale["country"])]
+        av := raw["profilePicture"].(map[string]string)
+        u.Avatar = av["displayImage"]
     }
 
     // Retrieve email
