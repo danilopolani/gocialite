@@ -82,7 +82,7 @@ var LinkedInUserFn = func(client *http.Client, u *structs.User) {
         return
     }
 
-    u.Email = email["elements"].(map[string]interface{})["handle~"].(map[string]interface{})["emailAddress"].(string)
+    u.Email = email["elements"].(map[string][]interface{})["handle~"][0].(map[string]interface{})["emailAddress"].(string)
 
 }
 
