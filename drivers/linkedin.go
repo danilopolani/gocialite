@@ -2,6 +2,7 @@ package drivers
 
 import (
     "encoding/json"
+    "fmt"
     "net/http"
 
     "github.com/danilopolani/gocialite/structs"
@@ -82,7 +83,8 @@ var LinkedInUserFn = func(client *http.Client, u *structs.User) {
         return
     }
 
-    u.Email = email["elements"].(map[string][]interface{})["handle~"][0].(map[string]interface{})["emailAddress"].(string)
+    fmt.Printf("\n\n\n\n%+v\n\n\n\n", email)
+    u.Email = email["elements"].([]interface{})[0].(map[string]interface{})["handle~"].(map[string]interface{})["emailAddress"].(string)
 
 }
 
