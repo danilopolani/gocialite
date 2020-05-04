@@ -2,7 +2,9 @@ package drivers
 
 import (
     "encoding/json"
+    "fmt"
     "net/http"
+    "os"
 
     "github.com/danilopolani/gocialite/structs"
     "golang.org/x/oauth2/linkedin"
@@ -32,6 +34,11 @@ var LinkedInAPIMap = map[string]string{
 
 // LinkedInUserFn is a callback to parse additional fields for User
 var LinkedInUserFn = func(client *http.Client, u *structs.User) {
+    defer func() {
+        if r := recover(); r != nil {
+            fmt.Fprintln(os.Stderr, r)
+        }
+    }()
     u.FullName = u.FirstName + " " + u.LastName
     // Retrieve email
     req, err := client.Get(LinkedInAPIMap["endpoint"] + LinkedInAPIMap["emailEndpoint"])
@@ -41,10 +48,14 @@ var LinkedInUserFn = func(client *http.Client, u *structs.User) {
     defer req.Body.Close()
     /*
        {
-           "handle": "urn:li:emailAddress:3775708763",
-           "handle~": {
+         "elements": [
+           {
+             "handle": "urn:li:emailAddress:3775708763",
+             "handle~": {
                "emailAddress": "hsimpson@linkedin.com"
+             }
            }
+         ]
        }
     */
     email := make(map[string]interface{})
