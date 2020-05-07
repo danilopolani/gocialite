@@ -27,8 +27,8 @@ var LinkedInUserMap = map[string]string{
     "firstName":          "_",
     "lastName":           "_",
     "formattedName":      "_",
-    "emailAddress":       "_",
-    "pictureUrl":         "_",
+    "emailAddress":       "Email",
+    "pictureUrl":         "Avatar",
 }
 
 // LinkedInAPIMap is the map for API endpoints
