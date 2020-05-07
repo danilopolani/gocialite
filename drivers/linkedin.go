@@ -23,6 +23,12 @@ var LinkedInUserMap = map[string]string{
     "id":                 "ID",
     "localizedFirstName": "FirstName",
     "localizedLastName":  "LastName",
+    "vanityName":         "_",
+    "firstName":          "_",
+    "lastName":           "_",
+    "formattedName":      "_",
+    "emailAddress":       "_",
+    "pictureUrl":         "_",
 }
 
 // LinkedInAPIMap is the map for API endpoints
@@ -69,4 +75,4 @@ var LinkedInUserFn = func(client *http.Client, u *structs.User) {
 }
 
 // LinkedInDefaultScopes contains the default scopes
-var LinkedInDefaultScopes = []string{"r_emailaddress", "r_liteprofile", "w_member_social"}
+var LinkedInDefaultScopes = []string{"r_emailaddress", "r_liteprofile"}
