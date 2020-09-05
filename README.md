@@ -1,9 +1,9 @@
 # Gocialite
-![Travis CI build](https://api.travis-ci.org/danilopolani/gocialite.svg?branch=master)
+![Travis CI build](https://api.travis-ci.org/gadelkareem/gocialite.svg?branch=master)
 ![Available Drivers](https://img.shields.io/badge/Drivers-5+-orange.svg)
-[![GoDoc](https://godoc.org/github.com/danilopolani/gocialite?status.svg)](https://godoc.org/github.com/danilopolani/gocialite)
-[![GoReport](https://goreportcard.com/badge/github.com/danilopolani/gocialite)](https://goreportcard.com/report/github.com/danilopolani/gocialite)
-![GitHub contributors](https://img.shields.io/github/contributors/danilopolani/gocialite.svg)
+[![GoDoc](https://godoc.org/github.com/gadelkareem/gocialite?status.svg)](https://godoc.org/github.com/gadelkareem/gocialite)
+[![GoReport](https://goreportcard.com/badge/github.com/gadelkareem/gocialite)](https://goreportcard.com/report/github.com/gadelkareem/gocialite)
+![GitHub contributors](https://img.shields.io/github/contributors/gadelkareem/gocialite.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 Gocialite is a Socialite inspired package to manage social oAuth authentication without problems.
@@ -11,7 +11,7 @@ The idea was born when I discovered that Goth is not so flexible: I was using Re
 
 ## Installation
 
-To install it, just run `go get gopkg.in/danilopolani/gocialite.v1` and include it in your app: `import "gopkg.in/danilopolani/gocialite.v1"`.
+To install it, just run `go get gopkg.in/gadelkareem/gocialite.v1` and include it in your app: `import "gopkg.in/gadelkareem/gocialite.v1"`.
 
 ## Available drivers
 
@@ -27,7 +27,7 @@ To install it, just run `go get gopkg.in/danilopolani/gocialite.v1` and include 
 
 ## Create new driver
 
-Please see [Contributing page](https://github.com/danilopolani/gocialite/blob/master/CONTRIBUTING.md) to learn how to create new driver and test it.
+Please see [Contributing page](https://github.com/gadelkareem/gocialite/blob/master/CONTRIBUTING.md) to learn how to create new driver and test it.
 
 ## Set scopes
 
@@ -108,7 +108,7 @@ func redirectHandler(c *gin.Context) {
 Now create a callback handler route, where we'll receive the content from the provider.  
 In order to validate the oAuth and retrieve the data, you have to invoke the `Handle()` method with two query parameters: `state` and `code`. In your URL, they will look like this: `http://localhost:9090/auth/github/callback?state=xxxxxxxx&code=xxxxxxxx`.  
 The `Handle()` method returns the user info, the token and error if there's one or `nil`.  
-If there are no errors, in the `user` variable you will find the logged in user information and in the `token` one, the token info (it's a [oauth2.Token struct](https://godoc.org/golang.org/x/oauth2#Token)). The data of the user - which is a [gocialite.User struct](https://github.com/danilopolani/gocialite/blob/master/structs/user.go) - are the following:
+If there are no errors, in the `user` variable you will find the logged in user information and in the `token` one, the token info (it's a [oauth2.Token struct](https://godoc.org/golang.org/x/oauth2#Token)). The data of the user - which is a [gocialite.User struct](https://github.com/gadelkareem/gocialite/blob/master/structs/user.go) - are the following:
 
 - ID
 - FirstName
@@ -153,11 +153,11 @@ func callbackHandler(c *gin.Context) {
 }
 ```
 
-Please take a look to [multi provider example](https://github.com/danilopolani/gocialite/wiki/Multi-provider-example) for a full working code with Gin Tonic and variable provider handler.
+Please take a look to [multi provider example](https://github.com/gadelkareem/gocialite/wiki/Multi-provider-example) for a full working code with Gin Tonic and variable provider handler.
 
 ## Contributors
 
-- [Danilo Polani](https://github.com/danilopolani)
+- [Danilo Polani](https://github.com/gadelkareem)
 - [Joseph Buchma](https://github.com/josephbuchma)
 - [Mark Beznos](https://github.com/vibbix)
 - [Davor Kapsa](https://github.com/dvrkps)

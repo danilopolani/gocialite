@@ -6,7 +6,7 @@ import (
     "net/http"
     "os"
 
-    "github.com/danilopolani/gocialite/structs"
+    "github.com/gadelkareem/gocialite/structs"
     "golang.org/x/oauth2/linkedin"
 )
 
