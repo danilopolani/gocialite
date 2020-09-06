@@ -3,10 +3,11 @@ package gocialite
 import (
     "testing"
 
+    "github.com/gadelkareem/cachita"
     "github.com/stretchr/testify/assert"
 )
 
-var gocialTest Gocial
+var gocialTest = Gocial{c: cachita.Memory()}
 
 func TestScopes(t *testing.T) {
     gocialTest.Scopes([]string{"email"})

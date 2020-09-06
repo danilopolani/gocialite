@@ -31,13 +31,12 @@ func NewDispatcher(c cachita.Cache) *Dispatcher {
 }
 
 // New Gocial instance
-func (d *Dispatcher) New() (*Gocial, error) {
+func (d *Dispatcher) New() *Gocial {
     d.mu.Lock()
     defer d.mu.Unlock()
     state := randToken()
-    g := &Gocial{State: state}
-    err := d.c.Put(state, &g, 0)
-    return g, err
+
+    return &Gocial{State: state, c: d.c}
 }
 
 // Handle callback. Can be called only once for given state.
@@ -66,6 +65,7 @@ type Gocial struct {
     Conf              *oauth2.Config
     User              structs.User
     Token             *oauth2.Token
+    c                 cachita.Cache
 }
 
 func init() {
@@ -140,6 +140,10 @@ func (g *Gocial) Redirect(clientID, clientSecret, redirectURL string) (string, e
         RedirectURL:  redirectURL,
         Scopes:       g.ScopesArr,
         Endpoint:     endpointMap[g.DriverName],
+    }
+    err = g.c.Put(g.State, &g, 0)
+    if err != nil {
+        return "", err
     }
 
     return g.Conf.AuthCodeURL(g.State), nil
