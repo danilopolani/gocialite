@@ -10,7 +10,6 @@ import (
     "net/url"
     "os"
     "strings"
-    "sync"
 
     "github.com/gadelkareem/cachita"
     "github.com/gadelkareem/gocialite/drivers"
@@ -21,7 +20,6 @@ import (
 
 // Dispatcher allows to safely issue concurrent Gocials
 type Dispatcher struct {
-    mu sync.RWMutex
     c  cachita.Cache
 }
 
@@ -32,11 +30,7 @@ func NewDispatcher(c cachita.Cache) *Dispatcher {
 
 // New Gocial instance
 func (d *Dispatcher) New() *Gocial {
-    d.mu.Lock()
-    defer d.mu.Unlock()
-    state := randToken()
-
-    return &Gocial{State: state, c: d.c}
+    return &Gocial{State: randToken(), c: d.c}
 }
 
 // Handle callback. Can be called only once for given state.
