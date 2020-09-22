@@ -11,7 +11,7 @@ The idea was born when I discovered that Goth is not so flexible: I was using Re
 
 ## Installation
 
-To install it, just run `go get github.com/gadelkareem/gocialite` and include it in your app: `import "github.com/gadelkareem/gocialite"`.
+To install it, just run `go get github.com/gadelkareem/gocialite/v2` and include it in your app: `import "github.com/gadelkareem/gocialite/v2"`.
 
 ## Available drivers
 
@@ -157,7 +157,7 @@ Please take a look to [multi provider example](https://github.com/gadelkareem/go
 
 ## Contributors
 
-- [Danilo Polani](https://github.com/gadelkareem)
+- [Danilo Polani](https://github.com/danilopolani)
 - [Joseph Buchma](https://github.com/josephbuchma)
 - [Mark Beznos](https://github.com/vibbix)
 - [Davor Kapsa](https://github.com/dvrkps)

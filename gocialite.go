@@ -12,8 +12,8 @@ import (
     "strings"
 
     "github.com/gadelkareem/cachita"
-    "github.com/gadelkareem/gocialite/drivers"
-    "github.com/gadelkareem/gocialite/structs"
+    "github.com/gadelkareem/gocialite/v2/drivers"
+    "github.com/gadelkareem/gocialite/v2/structs"
     "golang.org/x/oauth2"
     "gopkg.in/oleiade/reflections.v1"
 )
