@@ -6,6 +6,11 @@
 ![GitHub contributors](https://img.shields.io/github/contributors/danilopolani/gocialite.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
+## NOT MAINTAINED
+This project is no longer maintained.  
+
+----
+
 Gocialite is a Socialite inspired package to manage social oAuth authentication without problems.
 The idea was born when I discovered that Goth is not so flexible: I was using Revel and it was *impossible* to connect them properly.
 
