@@ -7,19 +7,19 @@ I suggest you to duplicate `drivers/bitbucket.go` since it's a complete code and
 
 ## Set variables
 
-Change [line 12](https://github.com/danilopolani/gocialite/blob/master/drivers/bitbucket.go#L12) with:
+Change [line 12](https://github.com/gadelkareem/gocialite/blob/master/drivers/bitbucket.go#L12) with:
 
 ```go
 const myProviderDriverName = "myprovider"
 ```
 
 It will be used in the `Driver()` function, example: `gocial.Driver("myprovider")`.  
-Now on [line 19](https://github.com/danilopolani/gocialite/blob/master/drivers/bitbucket.go#L19) you have to create the mapping from API to populate the User struct.  
+Now on [line 19](https://github.com/gadelkareem/gocialite/blob/master/drivers/bitbucket.go#L19) you have to create the mapping from API to populate the User struct.  
 The relation is `"json_field_name": "StructFieldName"`, so if in our JSON there's a field called "first_name", it will be `"first_name": "FirstName"`.  
 
 If there's some nested/complex field, please see the next chapter **User callback hook**.
 
-Finally, on [lines 26-30](https://github.com/danilopolani/gocialite/blob/master/drivers/bitbucket.go#L26-L30) you have to fill the fields for the endpoint baseurl and the path of the user endpoint.  
+Finally, on [lines 26-30](https://github.com/gadelkareem/gocialite/blob/master/drivers/bitbucket.go#L26-L30) you have to fill the fields for the endpoint baseurl and the path of the user endpoint.  
 In the case of Bitbucket, the email address is retrievable only from another endpoint, so we put in it also `emailEndpoint`, but usually you will need only `userEndpoint`.
 
 If your provider has the user endpoint located to `https://api.myprovider.com/me`, the struct will be this:
@@ -41,7 +41,7 @@ In the case of Bitbucket, we use this hook to populate two fields: *avatar* from
 The `client` variable is an `oAuth` client so it's already set up for oAuth details like `access_token`.
 
 ## Testing
-Use the [example page](https://github.com/danilopolani/gocialite/wiki/Example) as starting point. Set up the credentials of your app in the `providerSecrets` variable, like:
+Use the [example page](https://github.com/gadelkareem/gocialite/wiki/Example) as starting point. Set up the credentials of your app in the `providerSecrets` variable, like:
 
 ```go
 providerSecrets := map[string]map[string]string{
