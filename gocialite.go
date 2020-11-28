@@ -11,8 +11,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/danilopolani/gocialite/drivers"
-	"github.com/danilopolani/gocialite/structs"
+	"github.com/redaLaanait/gocialite/drivers"
+	"github.com/redaLaanait/gocialite/structs"
 	"golang.org/x/oauth2"
 	"gopkg.in/oleiade/reflections.v1"
 )
@@ -231,7 +231,7 @@ func jsonDecode(js []byte) (map[string]interface{}, error) {
 	if err := decoder.Decode(&decoded); err != nil {
 		return nil, err
 	}
-	
+
 	return decoded, nil
 }
 
