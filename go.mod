@@ -1,4 +1,4 @@
-module github.com/redaLaanait/gocialite
+module github.com/redaLaanait/gocialite/v2
 
 go 1.14
 

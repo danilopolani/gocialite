@@ -3,7 +3,7 @@ package drivers
 import (
 	"net/http"
 
-	"github.com/redaLaanait/gocialite/structs"
+	"github.com/redaLaanait/gocialite/v2/structs"
 	"golang.org/x/oauth2/linkedin"
 )
 

@@ -12,9 +12,9 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/redaLaanait/gocialite/drivers"
-	"github.com/redaLaanait/gocialite/stores"
-	"github.com/redaLaanait/gocialite/structs"
+	"github.com/redaLaanait/gocialite/v2/drivers"
+	"github.com/redaLaanait/gocialite/v2/stores"
+	"github.com/redaLaanait/gocialite/v2/structs"
 	"golang.org/x/oauth2"
 	"gopkg.in/oleiade/reflections.v1"
 )
