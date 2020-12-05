@@ -21,11 +21,12 @@ import (
 type Dispatcher struct {
 	mu sync.RWMutex
 	g  map[string]*Gocial
+	gt *Gocial
 }
 
 // NewDispatcher creates new Dispatcher
 func NewDispatcher() *Dispatcher {
-	return &Dispatcher{g: make(map[string]*Gocial)}
+	return &Dispatcher{g: make(map[string]*Gocial), gt: &Gocial{}}
 }
 
 // New Gocial instance
@@ -51,6 +52,12 @@ func (d *Dispatcher) Handle(state, code string) (*structs.User, *oauth2.Token, e
 	delete(d.g, state)
 	d.mu.Unlock()
 	return &g.User, g.Token, err
+}
+
+// HandleToken get user profiel
+func (d *Dispatcher) HandleToken(provider string, token string) (*structs.User, error) {
+	err := d.gt.HandleToken(provider, token)
+	return &d.gt.User, err
 }
 
 // Gocial is the main struct of the package
@@ -204,6 +211,56 @@ func (g *Gocial) Handle(state, code string) error {
 	return nil
 }
 
+// HandleToken get user profile from token
+func (g *Gocial) HandleToken(provider string, token string) error {
+	// Retrieve all from scopes
+	driverAPIMap := apiMap[provider]
+	driverUserMap := userMap[provider]
+	userEndpoint := strings.Replace(driverAPIMap["userEndpoint"], "%ACCESS_TOKEN", token, -1)
+
+	// Get user info
+	req, err := http.NewRequest("GET", driverAPIMap["endpoint"]+userEndpoint, nil) // , bytes.NewBuffer(jsonStr)
+	q := req.URL.Query()                                                           // Get a copy of the query values.
+	q.Add("access_token", token)
+	req.URL.RawQuery = q.Encode()
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	data, err := jsonDecode(body)
+	if err != nil {
+		return fmt.Errorf("Error decoding JSON: %s", err.Error())
+	}
+	_ = data
+	_ = driverUserMap
+
+	// Scan all fields and dispatch through the mapping
+	mapKeys := keys(driverUserMap)
+	gUser := structs.User{}
+	for k, f := range data {
+		if !inSlice(k, mapKeys) { // Skip if not in the mapping
+			continue
+		}
+
+		// Assign the value
+		// Dirty way, but we need to convert also int/float to string
+		_ = reflections.SetField(&gUser, driverUserMap[k], fmt.Sprint(f))
+	}
+
+	// Set the "raw" user interface
+	gUser.Raw = data
+
+	// Update the struct
+	g.User = gUser
+
+	return nil
+}
+
 // Generate a random token
 func randToken() string {
 	b := make([]byte, 32)
@@ -231,7 +288,7 @@ func jsonDecode(js []byte) (map[string]interface{}, error) {
 	if err := decoder.Decode(&decoded); err != nil {
 		return nil, err
 	}
-	
+
 	return decoded, nil
 }
 
