@@ -12,6 +12,7 @@ import (
 	"sync"
 
 	"github.com/danilopolani/gocialite/drivers"
+	"github.com/danilopolani/gocialite/drivers/option"
 	"github.com/danilopolani/gocialite/structs"
 	"golang.org/x/oauth2"
 	"gopkg.in/oleiade/reflections.v1"
@@ -34,6 +35,7 @@ func (d *Dispatcher) New() *Gocial {
 	defer d.mu.Unlock()
 	state := randToken()
 	g := &Gocial{state: state}
+	g.params = make(map[string]string)
 	d.g[state] = g
 	return g
 }
@@ -60,42 +62,32 @@ type Gocial struct {
 	conf          *oauth2.Config
 	User          structs.User
 	Token         *oauth2.Token
+	params        map[string]string
 }
 
-func init() {
-	drivers.InitializeDrivers(RegisterNewDriver)
-}
-
-var (
-	// Set the basic information such as the endpoint and the scopes URIs
-	apiMap = map[string]map[string]string{}
-
-	// Mapping to create a valid "user" struct from providers
-	userMap = map[string]map[string]string{}
-
-	// Map correct endpoints
-	endpointMap = map[string]oauth2.Endpoint{}
-
-	// Map custom callbacks
-	callbackMap = map[string]func(client *http.Client, u *structs.User){}
-
-	// Default scopes for each driver
-	defaultScopesMap = map[string][]string{}
-)
-
-//RegisterNewDriver adds a new driver to the existing set
-func RegisterNewDriver(driver string, defaultscopes []string, callback func(client *http.Client, u *structs.User), endpoint oauth2.Endpoint, apimap, usermap map[string]string) {
-	apiMap[driver] = apimap
-	userMap[driver] = usermap
-	endpointMap[driver] = endpoint
-	callbackMap[driver] = callback
-	defaultScopesMap[driver] = defaultscopes
+// RegisterNewDriver adds a new driver to the existing set
+// The function is deprecated, use drivers.RegisterDriver instead
+func RegisterNewDriver(
+	driver string,
+	defaultscopes []string,
+	callback func(client *http.Client, u *structs.User),
+	endpoint oauth2.Endpoint,
+	apimap map[string]string,
+	usermap map[string]string,
+) {
+	drivers.RegisterDriver(
+		option.APIMap(apimap),
+		option.UserMap(usermap),
+		option.Endpoint(endpoint),
+		option.Callback(callback),
+		option.DefaultScopes(defaultscopes),
+	)
 }
 
 // Driver is needed to choose the correct social
 func (g *Gocial) Driver(driver string) *Gocial {
 	g.driver = driver
-	g.scopes = defaultScopesMap[driver]
+	g.scopes = drivers.MustDriver(driver).DefaultScopes()
 
 	// BUG: sequential usage of single Gocial instance will have same CSRF token. This is serious security issue.
 	// NOTE: Dispatcher eliminates this bug.
@@ -112,10 +104,21 @@ func (g *Gocial) Scopes(scopes []string) *Gocial {
 	return g
 }
 
+// Params is used to set additional parameters for driver
+// for exapmle: APPLICATION_KEY for OK driver
+func (g *Gocial) Params(params map[string]string) *Gocial {
+	g.params = make(map[string]string)
+	for p, v := range params {
+		g.params["%"+p] = strings.ToUpper(v)
+	}
+	return g
+}
+
 // Redirect returns an URL for the selected social oAuth login
 func (g *Gocial) Redirect(clientID, clientSecret, redirectURL string) (string, error) {
+	drv, ok := drivers.Driver(g.driver)
 	// Check if driver is valid
-	if !inSlice(g.driver, complexKeys(apiMap)) {
+	if !ok {
 		return "", fmt.Errorf("Driver not valid: %s", g.driver)
 	}
 
@@ -133,7 +136,7 @@ func (g *Gocial) Redirect(clientID, clientSecret, redirectURL string) (string, e
 		ClientSecret: clientSecret,
 		RedirectURL:  redirectURL,
 		Scopes:       g.scopes,
-		Endpoint:     endpointMap[g.driver],
+		Endpoint:     drv.Endpoint(),
 	}
 
 	return g.conf.AuthCodeURL(g.state), nil
@@ -141,13 +144,15 @@ func (g *Gocial) Redirect(clientID, clientSecret, redirectURL string) (string, e
 
 // Handle callback from provider
 func (g *Gocial) Handle(state, code string) error {
+	drv, ok := drivers.Driver(g.driver)
+
 	// Handle the exchange code to initiate a transport.
 	if g.state != state {
 		return fmt.Errorf("Invalid state: %s", state)
 	}
 
 	// Check if driver is valid
-	if !inSlice(g.driver, complexKeys(apiMap)) {
+	if !ok {
 		return fmt.Errorf("Driver not valid: %s", g.driver)
 	}
 
@@ -162,9 +167,16 @@ func (g *Gocial) Handle(state, code string) error {
 	g.Token = token
 
 	// Retrieve all from scopes
-	driverAPIMap := apiMap[g.driver]
-	driverUserMap := userMap[g.driver]
-	userEndpoint := strings.Replace(driverAPIMap["userEndpoint"], "%ACCESS_TOKEN", token.AccessToken, -1)
+	driverAPIMap := drv.APIMap()
+	driverUserMap := drv.UserMap()
+	userEndpoint := driverAPIMap["userEndpoint"]
+	g.params["%ACCESS_TOKEN"] = token.AccessToken
+	if drv.Sig() != nil {
+		g.params["%SIG"] = drv.Sig()(g.conf, g.Token, g.params)
+	}
+	for p, v := range g.params {
+		userEndpoint = strings.Replace(userEndpoint, p, v, -1)
+	}
 
 	// Get user info
 	req, err := client.Get(driverAPIMap["endpoint"] + userEndpoint)
@@ -196,7 +208,7 @@ func (g *Gocial) Handle(state, code string) error {
 	gUser.Raw = data
 
 	// Custom callback
-	callbackMap[g.driver](client, &gUser)
+	drv.Callback()(client, &gUser)
 
 	// Update the struct
 	g.User = gUser

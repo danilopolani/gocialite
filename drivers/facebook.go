@@ -3,6 +3,7 @@ package drivers
 import (
 	"net/http"
 
+	"github.com/danilopolani/gocialite/drivers/option"
 	"github.com/danilopolani/gocialite/structs"
 	"golang.org/x/oauth2/facebook"
 )
@@ -10,7 +11,17 @@ import (
 const facebookDriverName = "facebook"
 
 func init() {
-	registerDriver(facebookDriverName, FacebookDefaultScopes, FacebookUserFn, facebook.Endpoint, FacebookAPIMap, FacebookUserMap)
+	err := RegisterDriver(
+		option.Driver(facebookDriverName),
+		option.DefaultScopes(FacebookDefaultScopes),
+		option.Callback(FacebookUserFn),
+		option.Endpoint(facebook.Endpoint),
+		option.APIMap(FacebookAPIMap),
+		option.UserMap(FacebookUserMap),
+	)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // FacebookUserMap is the map to create the User struct

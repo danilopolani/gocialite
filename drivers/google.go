@@ -3,6 +3,7 @@ package drivers
 import (
 	"net/http"
 
+	"github.com/danilopolani/gocialite/drivers/option"
 	"github.com/danilopolani/gocialite/structs"
 	"golang.org/x/oauth2/google"
 )
@@ -10,7 +11,17 @@ import (
 const googleDriverName = "google"
 
 func init() {
-	registerDriver(googleDriverName, GoogleDefaultScopes, GoogleUserFn, google.Endpoint, GoogleAPIMap, GoogleUserMap)
+	err := RegisterDriver(
+		option.Driver(googleDriverName),
+		option.DefaultScopes(GoogleDefaultScopes),
+		option.Callback(GoogleUserFn),
+		option.Endpoint(google.Endpoint),
+		option.APIMap(GoogleAPIMap),
+		option.UserMap(GoogleUserMap),
+	)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // GoogleUserMap is the map to create the User struct

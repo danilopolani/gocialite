@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/danilopolani/gocialite/drivers/option"
 	"github.com/danilopolani/gocialite/structs"
 	"golang.org/x/oauth2/slack"
 )
@@ -11,7 +12,17 @@ import (
 const slackDriverName = "slack"
 
 func init() {
-	registerDriver(slackDriverName, SlackDefaultScopes, SlackUserFn, slack.Endpoint, SlackAPIMap, SlackUserMap)
+	err := RegisterDriver(
+		option.Driver(slackDriverName),
+		option.DefaultScopes(SlackDefaultScopes),
+		option.Callback(SlackUserFn),
+		option.Endpoint(slack.Endpoint),
+		option.APIMap(SlackAPIMap),
+		option.UserMap(SlackUserMap),
+	)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // SlackUserMap is the map to create the User struct

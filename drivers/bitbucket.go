@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/danilopolani/gocialite/drivers/option"
 	"github.com/danilopolani/gocialite/structs"
 	"golang.org/x/oauth2/bitbucket"
 )
@@ -11,7 +12,17 @@ import (
 const bitbucketDriverName = "bitbucket"
 
 func init() {
-	registerDriver(bitbucketDriverName, BitbucketDefaultScopes, BitbucketUserFn, bitbucket.Endpoint, BitbucketAPIMap, BitbucketUserMap)
+	err := RegisterDriver(
+		option.Driver(bitbucketDriverName),
+		option.DefaultScopes(BitbucketDefaultScopes),
+		option.Callback(BitbucketUserFn),
+		option.Endpoint(bitbucket.Endpoint),
+		option.APIMap(BitbucketAPIMap),
+		option.UserMap(BitbucketUserMap),
+	)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // BitbucketUserMap is the map to create the User struct
