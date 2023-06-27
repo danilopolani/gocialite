@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ## NOT MAINTAINED
-This project is no longer maintained.  
+This project is no longer maintained, you should over a more robust solution like [Goth](https://github.com/markbates/goth).  
 
 ----
 
